@@ -11,6 +11,7 @@ namespace FinalProject_DBMSFin_
         public MainPage()
         {
             InitializeComponent();
+            this.StartPosition = FormStartPosition.CenterScreen;
         }
 
         private void MainPage_Load(object sender, EventArgs e)
@@ -110,6 +111,38 @@ namespace FinalProject_DBMSFin_
         private void button1_Click(object sender, EventArgs e)
         {
             SubmitButton_Click(sender, e);
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            // Create an instance of ShowTable form
+            ShowTable showTableForm = new ShowTable();
+
+            // Show the ShowTable form
+            showTableForm.Show();
+
+            // Close the current form (MainPage)
+            this.Close();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Create an instance of UpdatingPage form
+                UpdatingPage updatingPageForm = new UpdatingPage();
+
+                // Show the UpdatingPage form
+                updatingPageForm.Show();
+
+                // Close the current form (MainPage)
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                // Log the error or handle it appropriately for your application
+                MessageBox.Show("Error: " + ex.ToString());
+            }
         }
     }
 }

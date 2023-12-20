@@ -12,6 +12,7 @@ namespace FinalProject_DBMSFin_
         public LogRegPage()
         {
             InitializeComponent();
+            this.StartPosition = FormStartPosition.CenterScreen;
         }
 
         private void label3_Click(object sender, EventArgs e)
@@ -86,5 +87,6 @@ namespace FinalProject_DBMSFin_
         {
             // You can add code here if needed, for example, to handle password strength validation
         }
+
     }
 }
