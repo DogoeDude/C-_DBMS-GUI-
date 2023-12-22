@@ -18,3 +18,7 @@ an event.
 GUI updated. Not the best but it works.
 Create a bunch of different functions one for most is the ability to submit the entered event details
 into the existing localhost database specified table.
+
+Next update:
+Will be adding final touches slowly, and the ability to remove certain datas in rows, search names and 
+Merry Christmas
