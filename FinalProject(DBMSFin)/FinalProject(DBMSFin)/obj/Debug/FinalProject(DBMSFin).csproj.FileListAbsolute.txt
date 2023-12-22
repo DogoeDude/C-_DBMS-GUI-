@@ -43,3 +43,4 @@ D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\obj\Debug\FinalProject(DBMSFin).c
 D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\obj\Debug\FinalProject_DBMSFin_.MainPage.resources
 D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\obj\Debug\FinalProject_DBMSFin_.ShowTable.resources
 D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\obj\Debug\FinalProject_DBMSFin_.UpdatingPage.resources
+D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\obj\Debug\FinalProject_DBMSFin_.ShowDatabasePriest.resources

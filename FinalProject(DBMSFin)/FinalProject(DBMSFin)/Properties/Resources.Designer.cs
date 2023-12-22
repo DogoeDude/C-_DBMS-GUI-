@@ -63,6 +63,26 @@ namespace FinalProject_DBMSFin_.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Dog {
+            get {
+                object obj = ResourceManager.GetObject("Dog", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Event_removebg_preview {
+            get {
+                object obj = ResourceManager.GetObject("Event-removebg-preview", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap LeftArrow {
             get {
                 object obj = ResourceManager.GetObject("LeftArrow", resourceCulture);

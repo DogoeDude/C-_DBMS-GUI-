@@ -88,5 +88,22 @@ namespace FinalProject_DBMSFin_
             // You can add code here if needed, for example, to handle password strength validation
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Hide the current form (LogRegPage)
+                this.Hide();
+
+                // Show the 'ShowDatabasePriest' form
+                ShowDatabasePriest showDatabasePriestForm = new ShowDatabasePriest();
+                showDatabasePriestForm.Show();
+            }
+            catch (Exception ex)
+            {
+                // Log the error or handle it appropriately for your application
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
     }
 }
