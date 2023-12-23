@@ -22,3 +22,6 @@ into the existing localhost database specified table.
 Next update:
 Will be adding final touches slowly, and the ability to remove certain datas in rows, search names and 
 Merry Christmas
+
+Final changes have been made.
+Current Update I will name it as final build. Version 5.0 which is the complete app. 23-12-2023
