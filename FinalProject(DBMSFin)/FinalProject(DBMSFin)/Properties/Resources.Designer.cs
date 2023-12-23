@@ -63,6 +63,16 @@ namespace FinalProject_DBMSFin_.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap _93634 {
+            get {
+                object obj = ResourceManager.GetObject("93634", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Dog {
             get {
                 object obj = ResourceManager.GetObject("Dog", resourceCulture);
@@ -96,6 +106,36 @@ namespace FinalProject_DBMSFin_.Properties {
         internal static System.Drawing.Bitmap MainPage {
             get {
                 object obj = ResourceManager.GetObject("MainPage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap person_removebg_preview {
+            get {
+                object obj = ResourceManager.GetObject("person-removebg-preview", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap pngtree_blue_gradient_web_ui_background_image_518658 {
+            get {
+                object obj = ResourceManager.GetObject("pngtree-blue-gradient-web-ui-background-image_518658", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Refresh {
+            get {
+                object obj = ResourceManager.GetObject("Refresh", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

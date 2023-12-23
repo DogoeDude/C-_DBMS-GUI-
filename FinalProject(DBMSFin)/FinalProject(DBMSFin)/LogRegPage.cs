@@ -13,6 +13,8 @@ namespace FinalProject_DBMSFin_
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
         }
 
         private void label3_Click(object sender, EventArgs e)
@@ -104,6 +106,11 @@ namespace FinalProject_DBMSFin_
                 // Log the error or handle it appropriately for your application
                 MessageBox.Show("Error: " + ex.Message);
             }
+        }
+
+        private void LogRegPage_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

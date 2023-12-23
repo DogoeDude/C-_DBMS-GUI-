@@ -118,11 +118,17 @@
     <Compile Include="ShowDatabasePriest.Designer.cs">
       <DependentUpon>ShowDatabasePriest.cs</DependentUpon>
     </Compile>
-    <Compile Include="ShowTable.cs">
+    <Compile Include="Table1Person.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ShowTable.Designer.cs">
-      <DependentUpon>ShowTable.cs</DependentUpon>
+    <Compile Include="Table1Person.Designer.cs">
+      <DependentUpon>Table1Person.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Table2Events.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Table2Events.Designer.cs">
+      <DependentUpon>Table2Events.cs</DependentUpon>
     </Compile>
     <Compile Include="UpdatingPage.cs">
       <SubType>Form</SubType>
@@ -149,8 +155,11 @@
     <EmbeddedResource Include="ShowDatabasePriest.resx">
       <DependentUpon>ShowDatabasePriest.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ShowTable.resx">
-      <DependentUpon>ShowTable.cs</DependentUpon>
+    <EmbeddedResource Include="Table1Person.resx">
+      <DependentUpon>Table1Person.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Table2Events.resx">
+      <DependentUpon>Table2Events.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UpdatingPage.resx">
       <DependentUpon>UpdatingPage.cs</DependentUpon>
@@ -176,7 +185,11 @@
     <None Include="Resources\LeftArrow.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\person-removebg-preview.png" />
+    <None Include="Resources\pngtree-blue-gradient-web-ui-background-image_518658.jpg" />
+    <None Include="Resources\Refresh.png" />
     <None Include="Resources\Dog.jpg" />
+    <None Include="Resources\93634.png" />
     <Content Include="Resources\Event-removebg-preview.png" />
     <None Include="Resources\Event-removebg-preview1.png" />
   </ItemGroup>

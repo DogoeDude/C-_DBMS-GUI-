@@ -41,6 +41,7 @@ D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\bin\Debug\System.Runtime.Compiler
 D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\bin\Debug\System.Threading.Tasks.Extensions.xml
 D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\obj\Debug\FinalProject(DBMSFin).csproj.CopyComplete
 D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\obj\Debug\FinalProject_DBMSFin_.MainPage.resources
-D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\obj\Debug\FinalProject_DBMSFin_.ShowTable.resources
 D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\obj\Debug\FinalProject_DBMSFin_.UpdatingPage.resources
 D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\obj\Debug\FinalProject_DBMSFin_.ShowDatabasePriest.resources
+D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\obj\Debug\FinalProject_DBMSFin_.Table1Person.resources
+D:\FinalProject(DBMSFin)\FinalProject(DBMSFin)\obj\Debug\FinalProject_DBMSFin_.Table2Events.resources
