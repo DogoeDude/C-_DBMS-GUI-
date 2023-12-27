@@ -25,3 +25,6 @@ Merry Christmas
 
 Final changes have been made.
 Current Update I will name it as final build. Version 5.0 which is the complete app. 23-12-2023
+
+Update 5.1: Added a feature where the user now has privacy when entering a password. Added a security 
+feature to prevent injections by using SQL BINARY function.
