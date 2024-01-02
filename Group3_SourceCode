@@ -1,0 +1,1182 @@
+Hermosisima, Salon, Dubri, Baragona, Cabaya
+Code Sequence - LogRegPage.cs->MainPage.cs->ShowDatabasePriest.cs->Table1Person.cs->Table2Events.cs
+-----------------------------------------------------------------LogRegPage.cs---------------------------------------------------------------------------------------------
+using System;
+using System.Data;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+
+namespace FinalProject_DBMSFin_
+{
+    public partial class LogRegPage : Form
+    {
+        private MySqlConnection con = new MySqlConnection();
+
+        public LogRegPage()
+        {
+            InitializeComponent();
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            textBox2.PasswordChar = '*';
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            try
+            {
+                //We have opened up the SQL DB from localhost.
+                string connstring = "server=localhost;uid=root;pwd=password;database=churchsched";
+                con.ConnectionString = connstring;
+                con.Open();
+
+                string email = textBox1.Text;
+                string password = textBox2.Text;
+
+                //WHERE BINARY is a condition in which the data being compared is made to be case sensitive.
+                string sql = "SELECT * FROM loginfo WHERE BINARY email = @email AND epassword = @password";
+                MySqlCommand cmd = new MySqlCommand(sql, con);
+                cmd.Parameters.AddWithValue("@email", email);
+                cmd.Parameters.AddWithValue("@password", password);
+
+                MySqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    MessageBox.Show("Login successful!");
+                    this.Hide();
+                    MainPage mainPage = new MainPage();
+                    mainPage.Show();
+                }
+                else
+                {
+                    MessageBox.Show("Invalid email or password.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            textBox2.UseSystemPasswordChar = true;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                this.Hide();
+                ShowDatabasePriest showDatabasePriestForm = new ShowDatabasePriest();
+                showDatabasePriestForm.Text = "Priest View";
+                showDatabasePriestForm.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
+        private void LogRegPage_Load(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
+
+-----------------------------------------------------------------MainPage.cs---------------------------------------------------------------------------------------------
+
+using System;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+
+namespace FinalProject_DBMSFin_
+{
+    public partial class MainPage : Form
+    {
+        private MySqlConnection con = new MySqlConnection();
+
+        private System.Windows.Forms.ComboBox comboBoxTime;
+        
+        public MainPage()
+        {
+            InitializeComponent();
+            this.StartPosition = FormStartPosition.CenterScreen;
+            string connstring = "server=localhost;uid=root;pwd=password;database=churchsched";
+            con.ConnectionString = connstring;
+            comboBoxTime = new ComboBox();
+            LoadDataIntoComboBox();
+            this.KeyDown += new KeyEventHandler(MainPage_KeyDown);
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+        }
+        private void MainPage_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                button3_Click(sender, e);
+            }
+        }
+        private void MainPage_Load(object sender, EventArgs e)
+        {
+            string connstring = "server=localhost;uid=root;pwd=password;database=churchsched";
+            con.ConnectionString = connstring;
+        }
+
+        private void SubmitButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Check if any of the required textboxes are empty
+                if (string.IsNullOrWhiteSpace(textBox9.Text) ||
+                    comboBox1.SelectedItem == null ||
+                    string.IsNullOrWhiteSpace(textBox10.Text))
+                {
+                    MessageBox.Show("Your entries are lacking. Please fill them up accordingly.");
+                    return;  // Abort the operation if any required field is empty
+                }
+
+                if (!int.TryParse(textBox9.Text, out int schedID))
+                {
+                    MessageBox.Show("Invalid input for SchedID. Please enter a valid integer.");
+                    return;
+                }
+
+                if (comboBox1.Items.Count > 0 && comboBox1.SelectedItem != null)
+                {
+                    int churchSchedID = ((ChurchInfo)comboBox1.SelectedItem).ChurchID;
+
+                    string churchEvent = textBox10.Text;
+                    schedID = GetNextSchedID(); // Remove the 'int' type here
+                    DateTime eventDate = dateTimePicker1.Value;// Assuming you have a ComboBox named comboBox2 with time options from 12:00:00 AM to 12:00:00 PM
+                    TimeSpan schedTime = TimeSpan.Parse(comboBox2.SelectedItem.ToString());
+                    con.Open();
+                    string sql = "INSERT INTO schedsdb (SchedID, PersonSchedID, ChurchSchedID, EventDate, ChurchEvent, SchedTime) " +
+                                 "VALUES (@SchedID, @PersonSchedID, @ChurchSchedID, @EventDate, @ChurchEvent, @SchedTime)";
+                    MySqlCommand cmd = new MySqlCommand(sql, con);
+                    cmd.Parameters.AddWithValue("@SchedID", schedID);
+                    cmd.Parameters.AddWithValue("@ChurchSchedID", churchSchedID);
+                    cmd.Parameters.AddWithValue("@EventDate", eventDate.ToString("yyyy-MM-dd"));
+                    cmd.Parameters.AddWithValue("@ChurchEvent", churchEvent);
+                    cmd.Parameters.AddWithValue("@SchedTime", schedTime.ToString(@"hh\:mm\:ss"));
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Details saved successfully in schedsdb!");
+                    ClearTextBoxes();
+                }
+                else
+                {
+                    MessageBox.Show("You lack data. Please fill in the textboxes accordingly.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+        private void ResetButton_Click(object sender, EventArgs e)
+        {
+            ClearTextBoxes();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            ClearTextBoxes();
+        }
+        private void ClearTextBoxes()
+        {
+            foreach (Control control in Controls)
+            {
+                if (control is TextBox)
+                {
+                    ((TextBox)control).Clear();
+                }
+            }
+        }
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!int.TryParse(textBox1.Text, out int personID))
+                {
+                    MessageBox.Show("Invalid input for PersonID. Please enter a valid integer.");
+                    return;
+                }
+                con.Open();
+                string sql = "INSERT INTO personal_infoDb (PersonID, FirstName, LastName, ContactNum) " +
+                             "VALUES (@PersonID, @FirstName, @LastName, @ContactNum)";
+                MySqlCommand cmd = new MySqlCommand(sql, con);
+                cmd.Parameters.AddWithValue("@PersonID", personID);
+                cmd.Parameters.AddWithValue("@FirstName", textBox2.Text);
+                cmd.Parameters.AddWithValue("@LastName", textBox3.Text);
+                cmd.Parameters.AddWithValue("@ContactNum", textBox4.Text);
+                cmd.ExecuteNonQuery();
+
+                MessageBox.Show("Details saved successfully in personal_infoDb!");
+                ClearTextBoxes();
+            }
+            catch (MySqlException ex)
+            {
+                if (ex.Number == 1062) // MySQL error code for duplicate entry
+                {
+                    MessageBox.Show("PersonID already exists. Please enter a unique PersonID.");
+                }
+                else
+                {
+                    MessageBox.Show("Error: " + ex.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+
+        private void UpdatingPage_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            this.Show();  // Make the current form visible again when UpdatingPage is closed
+        }
+        private void button4_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdatingPage updatingPageForm = new UpdatingPage();
+                updatingPageForm.FormClosed += UpdatingPage_FormClosed;  // Subscribe to FormClosed event
+                updatingPageForm.Show();
+                this.Hide();  // Hide the current form instead of closing it
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.ToString());
+            }
+        }
+        private int GetNextSchedID()
+        {
+            try
+            {
+                con.Open();
+                string sql = "SELECT COALESCE(MAX(SchedID), 0) + 1 FROM schedsdb";
+                MySqlCommand cmd = new MySqlCommand(sql, con);
+                object result = cmd.ExecuteScalar();
+
+                if (result != DBNull.Value)
+                {
+                    return Convert.ToInt32(result);
+                }
+                else
+                {
+                    // If there are no records, start with SchedID = 1
+                    return 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error getting next SchedID: " + ex.ToString());
+                return -1;
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+        private bool DoesPersonIdExist(int personId)
+        {
+            try
+            {
+                con.Open();
+                string checkSql = "SELECT COUNT(*) FROM personal_infoDb WHERE PersonID = @PersonID";
+                MySqlCommand checkCmd = new MySqlCommand(checkSql, con);
+                checkCmd.Parameters.AddWithValue("@PersonID", personId);
+                int count = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                return count > 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error checking PersonID: " + ex.ToString());
+                return false;
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+        }
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+        {
+        }
+        private void textBox10_TextChanged(object sender, EventArgs e)
+        {
+        }
+        private void textBox11_TextChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void textBox9_TextChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void comboBoxTime_SelectedIndexChanged(object sender, EventArgs e)
+        {
+        }
+        public class ChurchInfo
+        {
+            public int ChurchID { get; set; }
+            public string ChurchName { get; set; }
+        }
+        private void LoadDataIntoComboBox()
+        {
+            try
+            {
+                con.Open();
+                string sql = "SELECT ChurchID, ChurchName FROM churchinfodb";
+                MySqlCommand cmd = new MySqlCommand(sql, con);
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    comboBox1.Items.Clear();
+                    while (reader.Read())
+                    {
+                        // Assuming 'ChurchID' and 'ChurchName' are the column names in your table
+                        int churchID = reader.GetInt32("ChurchID");
+                        string churchName = reader.GetString("ChurchName");
+                        // Create a new ChurchInfo object and add it to the ComboBox
+                        ChurchInfo churchInfo = new ChurchInfo { ChurchID = churchID, ChurchName = churchName };
+                        comboBox1.Items.Add(churchInfo);
+                    }
+                    comboBox1.DisplayMember = "ChurchName";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!int.TryParse(textBox1.Text, out int personID))
+                {
+                    MessageBox.Show("Invalid input Check all textboxes and enter valid details. ");
+                    return;
+                }
+                con.Open();
+                string sql = "INSERT INTO personal_infodb (PersonID, FirstName, LastName, ContactNum, Age, Barangay, City_Municipality, Province) " +
+                             "VALUES (@PersonID, @FirstName, @LastName, @ContactNum, @Age, @Barangay, @CityMunicipality, @Province)";
+                MySqlCommand cmd = new MySqlCommand(sql, con);
+                cmd.Parameters.AddWithValue("@PersonID", personID);
+                cmd.Parameters.AddWithValue("@FirstName", textBox2.Text);
+                cmd.Parameters.AddWithValue("@LastName", textBox3.Text);
+                cmd.Parameters.AddWithValue("@ContactNum", textBox4.Text);  // Correct data type for ContactNum
+                cmd.Parameters.AddWithValue("@Age", textBox5.Text);  // Correct data type for Age
+                cmd.Parameters.AddWithValue("@Barangay", textBox6.Text);
+                cmd.Parameters.AddWithValue("@CityMunicipality", textBox7.Text);
+                cmd.Parameters.AddWithValue("@Province", textBox8.Text);
+
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Details saved successfully in personal_infodb!");
+
+                ClearTextBoxes();
+            }
+            catch (MySqlException ex)
+            {
+                if (ex.Number == 1062) // MySQL error code for duplicate entry
+                {
+                    MessageBox.Show("PersonID already exists. Please enter a unique PersonID.");
+                }
+                else
+                {
+                    MessageBox.Show("Error: " + ex.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox6_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox7_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox8_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button6_Click_1(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!int.TryParse(textBox9.Text, out int personID))
+                {
+                    MessageBox.Show("Invalid input for PersonID. Please enter a valid integer.");
+                    return;
+                }
+                if (!DoesPersonIdExist(personID))
+                {
+                    MessageBox.Show("PersonID does not exist. Please enter a valid PersonID.");
+                    return;
+                }
+                if (comboBox1.Items.Count > 0 && comboBox1.SelectedItem != null)
+                {
+                    int churchSchedID = ((ChurchInfo)comboBox1.SelectedItem).ChurchID;
+                    string churchEvent = textBox10.Text;
+                    int schedID = GetNextSchedID();
+                    DateTime eventDate = dateTimePicker1.Value;
+                    string selectedTime = comboBox2.SelectedItem.ToString();
+                    TimeSpan parsedTime = TimeSpan.Parse(selectedTime);
+                    string dayNight = comboBox3.SelectedItem?.ToString() ?? "N/A";
+                    con.Open();
+                    string insertSql = "INSERT INTO schedsdb (SchedID, PersonSchedID, ChurchSchedID, EventDate, ChurchEvent, SchedTime, DN) " +
+                                        "VALUES (@SchedID, @PersonSchedID, @ChurchSchedID, @EventDate, @ChurchEvent, @SchedTime, @DN)";
+                    MySqlCommand insertCmd = new MySqlCommand(insertSql, con);
+                    insertCmd.Parameters.AddWithValue("@SchedID", schedID);
+                    insertCmd.Parameters.AddWithValue("@PersonSchedID", personID);
+                    insertCmd.Parameters.AddWithValue("@ChurchSchedID", churchSchedID);
+                    insertCmd.Parameters.AddWithValue("@EventDate", eventDate.ToString("yyyy-MM-dd")); // Format date as a string
+                    insertCmd.Parameters.AddWithValue("@ChurchEvent", churchEvent);
+                    insertCmd.Parameters.AddWithValue("@SchedTime", parsedTime.ToString()); // Store TimeSpan as a string
+                    insertCmd.Parameters.AddWithValue("@DN", dayNight); // Set the value for the DN column
+                    insertCmd.ExecuteNonQuery();
+                    MessageBox.Show("Details saved successfully!");
+
+                    // Clear all textboxes
+                    ClearTextBoxes();
+                }
+                else
+                {
+                    MessageBox.Show("No items in the ComboBox or SelectedItem is null. Please check your data.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+        private void textBox9_TextChanged_1(object sender, EventArgs e)
+        {
+        }
+        
+        private void comboBox1_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+        }
+        private void dateTimePicker1_ValueChanged_1(object sender, EventArgs e)
+        {
+        }
+        private void textBox10_TextChanged_1(object sender, EventArgs e)
+        {
+        }
+        private void comboBox2_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+        }
+        private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+        }
+        private void comboBox3_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+        }
+        
+        private void button5_Click_1(object sender, EventArgs e)
+        {
+            try
+            {
+                this.Hide();
+                Table2Events table2EventsForm = new Table2Events();
+                table2EventsForm.Text = "Events";
+                table2EventsForm.ShowDialog();
+            }
+            catch (Exception ex){
+                MessageBox.Show("Error: " + ex.ToString());
+            }
+        }
+
+        private void button4_Click_1(object sender, EventArgs e)
+        {
+            this.Close();
+            LogRegPage logRegPagerev = new LogRegPage();
+            logRegPagerev.ShowDialog();
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Table1Person table1PersonForm = new Table1Person();
+            table1PersonForm.Text = "Personal Informations";
+            table1PersonForm.ShowDialog();
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
+------------------------------------------------------------------------ShowDatabasePriest.cs---------------------------------------------------------------------------------
+using System;
+using System.Data;
+using System.Drawing;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+
+namespace FinalProject_DBMSFin_
+{
+    public partial class ShowDatabasePriest : Form
+    {
+        private MySqlConnection con = new MySqlConnection();
+
+        public ShowDatabasePriest()
+        {
+            InitializeComponent();
+            this.StartPosition = FormStartPosition.CenterScreen;
+
+            string connstring = "server=localhost;uid=root;pwd=password;database=churchsched";
+            con.ConnectionString = connstring;
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+        }
+
+        private void ShowDatabasePriest_Load(object sender, EventArgs e)
+        {
+            button1_Click(sender, e);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        { 
+            LoadDataAndSort("Firstname");
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            LoadDataAndSort("EventDate, SchedTime");
+        }
+
+        private void LoadDataAndSort(string orderBy)
+        {
+            try
+            {
+                con.Open();
+
+                // Select data from both tables using an INNER JOIN operation and apply sorting
+                string sql = $"SELECT personal_infodb.PersonID, personal_infodb.Firstname, personal_infodb.Lastname, " +
+                             $"personal_infodb.ContactNum, schedsdb.EventDate, schedsdb.ChurchEvent, " +
+                             $"schedsdb.SchedTime, " +
+                             $"CASE WHEN schedsdb.DN = 'AM' THEN 'AM' ELSE 'PM' END AS DN " +
+                             $"FROM personal_infodb " +
+                             $"INNER JOIN schedsdb ON personal_infodb.PersonID = schedsdb.PersonSchedID " +
+                             $"ORDER BY {orderBy}, CASE WHEN schedsdb.DN = 'AM' THEN 0 ELSE 1 END, schedsdb.SchedTime";
+
+                MySqlDataAdapter adapter = new MySqlDataAdapter(sql, con);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                dataGridView1.DataSource = dt;
+                foreach (DataGridViewRow row in dataGridView1.Rows)
+                {
+                    DateTime eventDate = Convert.ToDateTime(row.Cells["EventDate"].Value);
+                    if (eventDate > DateTime.Today)
+                    {
+                        row.DefaultCellStyle.BackColor = Color.Green;
+                    }
+                    else
+                    {
+                        row.DefaultCellStyle.BackColor = Color.Red;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.ToString());
+            }
+            finally
+            { 
+                con.Close();
+            }
+        }
+
+
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            this.Close();
+            LogRegPage logRegPagerev = new LogRegPage();
+            logRegPagerev.Show();
+        }
+    }
+}
+----------------------------------------------------------------------------Table1Person.cs-------------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+
+namespace FinalProject_DBMSFin_
+{
+    public partial class Table1Person : Form
+    {
+        private string ConnectionString = "server=localhost;uid=root;pwd=password;database=churchsched";
+        public Table1Person()
+        {
+            InitializeComponent();
+            LoadDataIntoDataGridView();
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+        }
+
+        private void LoadDataIntoDataGridView()
+        {
+            try
+            {
+                string connstring = "server=localhost;uid=root;pwd=password;database=churchsched";
+                using (MySqlConnection con = new MySqlConnection(connstring))
+                {
+                    con.Open();
+                    string sql = "SELECT PersonID, FirstName, LastName, ContactNum, Age, Barangay, City_Municipality, Province FROM personal_infodb";
+                    MySqlCommand cmd = new MySqlCommand(sql, con);
+
+                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(cmd))
+                    {
+                        DataTable dataTable = new DataTable();
+                        adapter.Fill(dataTable);
+                        dataGridView2.DataSource = dataTable;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.ToString());
+            }
+        }
+
+        private void Table1Person_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int selectedIndex = dataGridView2.CurrentCell.RowIndex;
+                int personIDToDelete = Convert.ToInt32(dataGridView2.Rows[selectedIndex].Cells["PersonID"].Value);
+                DeleteRowFromDatabase(personIDToDelete);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.ToString());
+            }
+        }
+
+        private void DeleteRowFromDatabase(int personID)
+        {
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(ConnectionString))
+                {
+                    connection.Open();
+
+                    string deleteQuery = "DELETE FROM personal_infodb WHERE PersonID = @PersonID";
+
+                    using (MySqlCommand deleteCommand = new MySqlCommand(deleteQuery, connection))
+                    {
+                        deleteCommand.Parameters.AddWithValue("@PersonID", personID);
+
+                        int rowsAffected = deleteCommand.ExecuteNonQuery();
+
+                        if (rowsAffected > 0)
+                        {
+                            MessageBox.Show("Row deleted successfully.");
+                            LoadDataIntoDataGridView(); // Refresh the data in the DataGridView
+                        }
+                        else
+                        {
+                            MessageBox.Show("No rows were deleted.");
+                        }
+                    }
+                }
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine($"MySQL Error: {ex.Number} - {ex.Message}");
+                MessageBox.Show($"MySQL Error: {ex.Number} - {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
+
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                DataTable changes = ((DataTable)dataGridView2.DataSource).GetChanges();
+                if (changes != null)
+                {
+                    UpdateChangesInDatabase(changes);
+                    ((DataTable)dataGridView2.DataSource).AcceptChanges();
+
+                    MessageBox.Show("Changes saved successfully!");
+                }
+                else
+                {
+                    MessageBox.Show("No changes to save.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error saving changes: " + ex.ToString());
+            }
+        }
+        private void UpdateChangesInDatabase(DataTable dataTable)
+        {
+            try
+            {
+                using (MySqlConnection con = new MySqlConnection("server=localhost;uid=root;pwd=password;database=churchsched"))
+                {
+                    con.Open();
+
+                    using (MySqlDataAdapter adapter = new MySqlDataAdapter("SELECT * FROM personal_infodb", con))
+                    {
+                        using (MySqlCommandBuilder builder = new MySqlCommandBuilder(adapter))
+                        {
+                            adapter.Update(dataTable);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error updating changes to the database: " + ex.ToString());
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            this.Close();
+            MainPage mainPageForm = new MainPage();
+            mainPageForm.Show();
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string searchText = textBox1.Text.Trim();
+
+                if (!string.IsNullOrEmpty(searchText))
+                {
+                    using (MySqlConnection connection = new MySqlConnection(ConnectionString))
+                    {
+                        connection.Open();
+
+                        string searchQuery = "SELECT PersonID, FirstName, LastName, ContactNum, Age, Barangay, City_Municipality, Province " +
+                                             "FROM personal_infodb " +
+                                             "WHERE FirstName LIKE @SearchText OR LastName LIKE @SearchText";
+
+                        using (MySqlCommand searchCommand = new MySqlCommand(searchQuery, connection))
+                        {
+                            searchCommand.Parameters.AddWithValue("@SearchText", $"%{searchText}%");
+
+                            using (MySqlDataAdapter adapter = new MySqlDataAdapter(searchCommand))
+                            {
+                                DataTable dataTable = new DataTable();
+                                adapter.Fill(dataTable);
+                                dataGridView2.DataSource = dataTable;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please enter a search term.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error searching data: " + ex.ToString());
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                LoadDataIntoDataGridView();
+                MessageBox.Show("Data refreshed successfully!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error refreshing data: " + ex.ToString());
+            }
+        }
+
+        private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+    }
+}
+---------------------------------------------------------------------------Table2Events.cs--------------------------------------------------------------------------------
+using System;
+using System.Data;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient; // Add this for MySQL support
+
+namespace FinalProject_DBMSFin_
+{
+    public partial class Table2Events : Form
+    {
+        private const string ConnectionString = "Server=localhost;Database=churchsched;Uid=root;Pwd=password;";
+
+        public Table2Events()
+        {
+            InitializeComponent();
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+        }
+
+        private void Table2Events_Load(object sender, EventArgs e)
+        {
+            LoadDataFromDatabase();
+        }
+
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Close();
+            MainPage mainPageForm = new MainPage();
+            mainPageForm.Show();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            SaveChangesToDatabase();
+        }
+
+        private void SaveChangesToDatabase()
+        {
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(ConnectionString))
+                {
+                    connection.Open();
+
+                    // Assuming "schedsdb" is the name of your table
+                    string selectQuery = "SELECT * FROM schedsdb";
+                    string updateQuery = "UPDATE schedsdb SET PersonSchedID = @PersonSchedID, ChurchSchedID = @ChurchSchedID, EventDate = @EventDate, ChurchEvent = @ChurchEvent, SchedTime = @SchedTime, DN = @DN WHERE SchedID = @SchedID";
+
+                    using (MySqlCommand selectCommand = new MySqlCommand(selectQuery, connection))
+                    using (MySqlCommand updateCommand = new MySqlCommand(updateQuery, connection))
+                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(selectCommand))
+                    using (MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(adapter))
+                    {
+                        DataTable dataTable = new DataTable();
+                        adapter.Fill(dataTable);
+                        dataGridView1.EndEdit();
+                        adapter.Update(dataTable);
+                    }
+                }
+
+                MessageBox.Show("Changes saved successfully.");
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine($"MySQL Error: {ex.Number} - {ex.Message}");
+                MessageBox.Show($"MySQL Error: {ex.Number} - {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            int selectedIndex = dataGridView1.CurrentCell.RowIndex;
+
+            // Get the value of the SchedID column for the selected row
+            int schedIDToDelete = Convert.ToInt32(dataGridView1.Rows[selectedIndex].Cells["SchedID"].Value);
+            DeleteRowFromDatabase(schedIDToDelete);
+        }
+
+        private void DeleteRowFromDatabase(int schedID)
+        {
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(ConnectionString))
+                {
+                    connection.Open();
+
+                    string deleteQuery = "DELETE FROM schedsdb WHERE SchedID = @SchedID";
+
+                    using (MySqlCommand deleteCommand = new MySqlCommand(deleteQuery, connection))
+                    {
+                        deleteCommand.Parameters.AddWithValue("@SchedID", schedID);
+
+                        int rowsAffected = deleteCommand.ExecuteNonQuery();
+
+                        if (rowsAffected > 0)
+                        {
+                            MessageBox.Show("Row deleted successfully.");
+                            LoadDataFromDatabase(); // Refresh the data in the DataGridView
+                        }
+                        else
+                        {
+                            MessageBox.Show("No rows were deleted.");
+                        }
+                    }
+                }
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine($"MySQL Error: {ex.Number} - {ex.Message}");
+                MessageBox.Show($"MySQL Error: {ex.Number} - {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
+
+        private void LoadDataFromDatabase()
+        {
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(ConnectionString))
+                {
+                    connection.Open();
+
+                    string query = "SELECT schedsdb.SchedID, " +
+                                           "personal_infodb.Firstname, " +
+                                           "personal_infodb.Lastname, " +
+                                           "churchinfodb.ChurchName, " +
+                                           "schedsdb.EventDate, " +
+                                           "schedsdb.ChurchEvent, " +
+                                           "schedsdb.SchedTime, " +
+                                           "schedsdb.DN " +
+                                   "FROM schedsdb " +
+                                   "INNER JOIN personal_infodb ON schedsdb.PersonSchedID = personal_infodb.PersonID " +
+                                   "INNER JOIN churchinfodb ON schedsdb.ChurchSchedID = churchinfodb.ChurchID";
+
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+                        {
+                            DataTable dataTable = new DataTable();
+                            adapter.Fill(dataTable);
+                            dataGridView1.DataSource = dataTable;
+                        }
+                    }
+                }
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine($"MySQL Error: {ex.Number} - {ex.Message}");
+                MessageBox.Show($"MySQL Error: {ex.Number} - {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
+        private void button5_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                LoadDataFromDatabase();
+                MessageBox.Show("Data refreshed successfully!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error refreshing data: " + ex.ToString());
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string searchText = textBox1.Text.Trim();
+
+                if (!string.IsNullOrEmpty(searchText))
+                {
+                    using (MySqlConnection connection = new MySqlConnection(ConnectionString))
+                    {
+                        connection.Open();
+
+                        string searchQuery = "SELECT schedsdb.SchedID, " +
+                                             "personal_infodb.Firstname, " +
+                                             "personal_infodb.Lastname, " +
+                                             "churchinfodb.ChurchName, " +
+                                             "schedsdb.EventDate, " +
+                                             "schedsdb.ChurchEvent, " +
+                                             "schedsdb.SchedTime, " +
+                                             "schedsdb.DN " +
+                                             "FROM schedsdb " +
+                                             "INNER JOIN personal_infodb ON schedsdb.PersonSchedID = personal_infodb.PersonID " +
+                                             "INNER JOIN churchinfodb ON schedsdb.ChurchSchedID = churchinfodb.ChurchID " +
+                                             $"WHERE personal_infodb.Firstname LIKE @SearchText OR personal_infodb.Lastname LIKE @SearchText";
+
+                        using (MySqlCommand searchCommand = new MySqlCommand(searchQuery, connection))
+                        {
+                            searchCommand.Parameters.AddWithValue("@SearchText", $"%{searchText}%");
+
+                            using (MySqlDataAdapter adapter = new MySqlDataAdapter(searchCommand))
+                            {
+                                DataTable dataTable = new DataTable();
+                                adapter.Fill(dataTable);
+                                dataGridView1.DataSource = dataTable;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please enter a search term.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error searching data: " + ex.ToString());
+            }
+        }
+
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+    }
+}
